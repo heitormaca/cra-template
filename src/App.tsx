@@ -1,25 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { RouperClient, RouperProvider } from 'rouper-navigation';
+import axiosInstance from './core/configs/axios';
+import { MantineConfigProvider } from './core/configs/mantine';
+import queryClient, { QueryClientProvider } from './core/configs/react-query';
+import RouterSetting from './core/configs/routes';
+import { AuthProvider, AuthStateTypes, Session } from './core/context/auth';
 
 function App() {
+  const rouperClient = new RouperClient({
+    storage: window.localStorage,
+    storageKeyClaims: 'MY_STORAGE_KEY',
+  });
+
+  function watchSession(session: Session | null, state: AuthStateTypes) {
+    if (state === 'AUTHENTICATED') {
+      axiosInstance.defaults.headers.common[
+        'Authorization'
+      ] = `Bearer ${session?.tokens.accessToken}`;
+    } else if (state === 'UNAUTHENTICATED') {
+      axiosInstance.defaults.headers.common['Authorization'] = ``;
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider watchSession={watchSession}>
+      <RouperProvider client={rouperClient}>
+        <QueryClientProvider client={queryClient}>
+          <MantineConfigProvider>
+            <RouterSetting />
+          </MantineConfigProvider>
+        </QueryClientProvider>
+      </RouperProvider>
+    </AuthProvider>
   );
 }
 
