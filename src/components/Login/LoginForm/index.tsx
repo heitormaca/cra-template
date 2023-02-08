@@ -1,8 +1,7 @@
 // import { useAuth } from '@/core/context/auth';
-import { AuthContext } from '@/core/context/auth/Auth.provider';
+import { useAuthLogin } from '@/core/domains/auth/auth.hooks';
 import { Button, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useContext } from 'react';
 import { RiLoginBoxLine } from 'react-icons/ri';
 
 interface LoginFormValues {
@@ -11,11 +10,9 @@ interface LoginFormValues {
 }
 
 const LoginForm: React.FC = () => {
-  const context = useContext(AuthContext);
-
   // const { setSession } = useAuth();
 
-  console.log(context);
+  const mutation = useAuthLogin();
 
   const form = useForm<LoginFormValues>({
     initialValues: { email: '', password: '' },
@@ -25,8 +22,8 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  function handleSubmit(values: LoginFormValues) {
-    console.log(values);
+  async function handleSubmit(values: LoginFormValues) {
+    await mutation.mutateAsync(values);
 
     // setSession({
     //   user: {

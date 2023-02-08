@@ -1,16 +1,15 @@
 import { RouperClient, RouperProvider } from 'rouper-navigation';
-import axiosInstance from './core/configs/axios';
+import { axiosInstance } from './core/configs/axios';
 import { MantineConfigProvider } from './core/configs/mantine';
 import queryClient, { QueryClientProvider } from './core/configs/react-query';
 import RouterSetting from './core/configs/routes';
 import { AuthProvider, AuthStateTypes, Session } from './core/context/auth';
 
+const rouperClient = new RouperClient({
+  // storage: window.localStorage,
+  // storageKeyClaims: 'MY_STORAGE_KEY',
+});
 function App() {
-  const rouperClient = new RouperClient({
-    storage: window.localStorage,
-    storageKeyClaims: 'MY_STORAGE_KEY',
-  });
-
   function watchSession(session: Session | null, state: AuthStateTypes) {
     if (state === 'AUTHENTICATED') {
       axiosInstance.defaults.headers.common[
