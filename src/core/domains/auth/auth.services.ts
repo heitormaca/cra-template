@@ -12,4 +12,12 @@ export default {
 
     return result.data;
   },
+
+  async refresh() {
+    const result = await axiosInstance.post<AuthResponse>(
+      `${URL_CONTROLLER}/auth/refresh`,
+    );
+
+    return result.data;
+  },
 };

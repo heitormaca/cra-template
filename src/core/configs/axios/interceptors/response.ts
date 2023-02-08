@@ -1,20 +1,39 @@
+import authServices from '@/core/domains/auth/auth.services';
+import getDecodeToken from '@/core/utils/auth/getDecodeToken';
 import { AxiosError, AxiosInterceptorManager, AxiosResponse } from 'axios';
+import dayjs from 'dayjs';
 
 export default function responseInterceptor(
   response: AxiosInterceptorManager<AxiosResponse>,
 ) {
   response.use(
     (config) => config,
-    (error: AxiosError) => {
-      // TODO
+    async (error: AxiosError) => {
+      const router = window.location;
 
-      // if 401 and not login request and i have the old token
+      if (error.response?.status !== 401) return Promise.reject(error);
 
-      // ao invez de verificar direto o local storage, pegar direto da instancia o objeto de auth
+      if (router.pathname === 'auth' || router.pathname === 'auth/refresh')
+        return Promise.reject(error);
 
-      // do refresh token and replace the new token in localstorage
+      const token = getDecodeToken();
 
-      return Promise.reject(error);
+      if (token) {
+        const now = dayjs();
+        const exp = dayjs.unix(token.exp);
+
+        const minutesToExpire = exp.diff(now, 'minutes');
+
+        if (!minutesToExpire || minutesToExpire < 10) {
+          try {
+            const result = await authServices.refresh();
+
+            localStorage.setItem('token', result.token);
+          } catch (err) {
+            Promise.reject(err);
+          }
+        }
+      }
     },
   );
 }
