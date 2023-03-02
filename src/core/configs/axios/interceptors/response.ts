@@ -24,13 +24,17 @@ export default function responseInterceptor(
 
         const minutesToExpire = exp.diff(now, 'minutes');
 
+        console.log(minutesToExpire);
+
         if (!minutesToExpire || minutesToExpire < 10) {
           try {
             const result = await authServices.refresh();
 
             localStorage.setItem('token', result.token);
-          } catch (err) {
-            Promise.reject(err);
+
+            return;
+          } catch {
+            return Promise.reject(error);
           }
         }
       }

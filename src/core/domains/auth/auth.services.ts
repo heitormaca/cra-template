@@ -1,12 +1,12 @@
-import { axiosInstance, SERVICE_BASE_URL } from '@/core/configs/axios';
+import { axiosInstance } from '@/core/configs/axios';
 import { AuthRequestParams, AuthResponse } from './auth.types';
 
-const URL_CONTROLLER = `${SERVICE_BASE_URL}`;
+const URL_CONTROLLER = `/auth`;
 
 export default {
   async access(data: AuthRequestParams) {
     const result = await axiosInstance.post<AuthResponse>(
-      `${URL_CONTROLLER}/auth`,
+      `${URL_CONTROLLER}`,
       data,
     );
 
@@ -15,7 +15,7 @@ export default {
 
   async refresh() {
     const result = await axiosInstance.post<AuthResponse>(
-      `${URL_CONTROLLER}/auth/refresh`,
+      `${URL_CONTROLLER}/refresh`,
     );
 
     return result.data;
